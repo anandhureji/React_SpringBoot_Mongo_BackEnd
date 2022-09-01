@@ -2,11 +2,13 @@ package net.javaguides.SpringMongoDb.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,5 +52,20 @@ public class TodoController {
 		}
 	}
 	
+	
+	@GetMapping("/todos/{id}")
+	public ResponseEntity<?> getSingleTodos(@PathVariable("id") String id)
+	{
+		Optional<TodoDto> todoOptional =repositiory.findById(id);
+		if(todoOptional.isPresent())
+		{
+			return new ResponseEntity<>(todoOptional.get(),HttpStatus.OK);
+		}
+		else
+		{
+			return new ResponseEntity<>("Todo not found with id "+id,HttpStatus.NOT_FOUND);
+		}
+		
+	}
 
 }
