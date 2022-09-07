@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,6 +67,43 @@ public class TodoController {
 		{
 			return new ResponseEntity<>("Todo not found with id "+id,HttpStatus.NOT_FOUND);
 		}
+		
+	}
+	
+	@PutMapping("/todos/{id}")
+	public ResponseEntity<?> updateById(@PathVariable("id") String id,@RequestBody TodoDto dto)
+	{
+		Optional<TodoDto> todoOptional =repositiory.findById(id);
+		if(todoOptional.isPresent())
+		{
+			TodoDto todoDto = todoOptional.get();
+			todoDto.setCompleted(dto.getCompleted()!=null?dto.getCompleted():todoDto.getCompleted());
+			todoDto.setTodo(dto.getTodo()!=null?dto.getTodo():todoDto.getTodo());
+			todoDto.setDescription(dto.getDescription()!=null?dto.getDescription():todoDto.getDescription());
+			todoDto.setUpdatedAt(new Date(System.currentTimeMillis()));
+			repositiory.save(todoDto);
+			return new ResponseEntity<>(todoDto,HttpStatus.OK);
+		}
+		else
+		{
+			return new ResponseEntity<>("Todo not found with id "+id,HttpStatus.NOT_FOUND);
+		}
+		
+	}
+	
+	
+	@DeleteMapping("/todos/{id}")
+	public ResponseEntity<?> deleteById(@PathVariable("id") String id)
+	{
+		try {
+			repositiory.deleteById(id);
+			return new ResponseEntity<>("Successfully deleted with id "+id,HttpStatus.OK);
+		}
+		catch(Exception e){
+			return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+			
+		}
+		
 		
 	}
 
